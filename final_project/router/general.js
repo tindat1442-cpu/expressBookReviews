@@ -25,7 +25,7 @@ public_users.post("/register", (req,res) => {
 // Get the book list available in the shop
 public_users.get('/',function (req, res) {
  let get_books = new Promise((resolve,reject)=>{
-    resolve(books)
+      resolve(books)
  })
     get_books.then((books)=>{
         res.send(JSON.stringify(books))
@@ -39,12 +39,14 @@ public_users.get('/isbn/:isbn',function (req, res) {
   //Write your code here
   const isbn = req.params.isbn;
   let get_books_by_isbn = new Promise((resolve,reject)=>{
-    resolve(books[isbn])
+    if(books[isbn]) {
+      resolve(books[isbn])
+    } else {reject("book not found")}
  })
     get_books_by_isbn.then((books)=>{
         res.send(JSON.stringify(books))
     }).catch((error)=>{
-        res.status(400).json({message:"Error"});
+        res.status(400).json({message:"Error or book not found"});
     })
  });
   
@@ -53,13 +55,17 @@ public_users.get('/author/:author',function (req, res) {
   //Write your code here
   const author = req.params.author;
   let bookKeys = Object.keys(books);
+  let result = {}
   
   let get_books_by_author = new Promise((resolve,reject)=>{
     for(let key of bookKeys){
         if(books[key]["author"]==author){
-            resolve(books[key])
+            result[key] = books[key]
         }
       }
+    if(Object.keys(result).length>0){
+      resolve(result)
+    } else {reject("no books found for this author")}
  })
     get_books_by_author.then((books)=>{
         res.send(JSON.stringify(books))
@@ -74,12 +80,17 @@ public_users.get('/title/:title',function (req, res) {
   //Write your code here
   const title = req.params.title;
   let bookKeys = Object.keys(books);
+  let result = {}
+  
   let get_books_by_title = new Promise((resolve,reject)=>{
     for(let key of bookKeys){
         if(books[key]["title"]==title){
-            resolve(books[key])
+            result[key] = books[key]
         }
       }
+    if(Object.keys(result).length>0){
+      resolve(result)
+    } else {reject("no books found for this author")}
  })
     get_books_by_title.then((books)=>{
         res.send(JSON.stringify(books))
